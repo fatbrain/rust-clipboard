@@ -16,12 +16,11 @@ limitations under the License.
 
 use std::error::Error;
 
-pub fn err(s: &str) -> Box<Error> {
-    Box::<Error + Send + Sync>::from(s)
-}
-
 /// Trait for clipboard access
-pub trait ClipboardProvider: Sized {
+pub trait ClipboardProvider<T>: Sized
+where
+   T: Sized + Iterator<Item=usize>
+{
     /// Create a context with which to access the clipboard
     // TODO: consider replacing Box<Error> with an associated type?
     fn new() -> Result<Self, Box<Error>>;
@@ -31,4 +30,5 @@ pub trait ClipboardProvider: Sized {
     fn set_contents(&mut self, String) -> Result<(), Box<Error>>;
     // TODO: come up with some platform-agnostic API for richer types
     // than just strings (c.f. issue #31)
+    fn iter(&mut self) -> T;
 }

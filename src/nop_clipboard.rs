@@ -19,7 +19,17 @@ use std::error::Error;
 
 pub struct NopClipboardContext;
 
-impl ClipboardProvider for NopClipboardContext {
+pub struct NopListener;
+
+impl Iterator for NopListener {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<usize> {
+        None
+    }
+}
+
+impl ClipboardProvider<NopListener> for NopClipboardContext {
     fn new() -> Result<NopClipboardContext, Box<Error>> {
         Ok(NopClipboardContext)
     }
@@ -32,5 +42,8 @@ impl ClipboardProvider for NopClipboardContext {
         println!("Attempting to set the contents of the clipboard, which hasn't yet been \
                   implemented on this platform.");
         Ok(())
+    }
+    fn iter(&mut self) -> NopListener {
+        NopListener
     }
 }

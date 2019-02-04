@@ -22,6 +22,20 @@ use x11_clipboard_crate::Atoms;
 use x11_clipboard_crate::Clipboard as X11Clipboard;
 use x11_clipboard_crate::xcb::xproto::Atom;
 
+pub struct X11ClipboardListener(X11Clipboard);
+
+impl Iterator for X11ClipboardListener {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<usize> {
+        let _r = self.0.load_wait(
+            self.0.getter.atoms.clipboard,
+            self.0.getter.atoms.utf8_string,
+            self.0.getter.atoms.property);
+        Some(0)
+    }
+}
+
 pub trait Selection {
     fn atom(atoms: &Atoms) -> Atom;
 }
@@ -46,7 +60,7 @@ pub struct X11ClipboardContext<S = Clipboard>(X11Clipboard, PhantomData<S>)
 where
     S: Selection;
 
-impl<S> ClipboardProvider for X11ClipboardContext<S>
+impl<S> ClipboardProvider<X11ClipboardListener> for X11ClipboardContext<S>
 where
     S: Selection,
 {
@@ -69,5 +83,9 @@ where
             self.0.setter.atoms.utf8_string,
             data,
         )?)
+    }
+
+    fn iter(&mut self) -> X11ClipboardListener {
+        X11ClipboardListener(X11Clipboard::new().unwrap())
     }
 }
