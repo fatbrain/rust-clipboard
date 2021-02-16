@@ -7,6 +7,9 @@ repository = "https://github.com/aweinstock314/rust-clipboard"
 license = "MIT / Apache-2.0"
 keywords = ["clipboard"]
 
+[dependencies]
+thiserror = "1"
+
 [target.'cfg(windows)'.dependencies]
 clipboard-win = "2.1"
 
